@@ -7,7 +7,7 @@ release metadata, and tested ten hypotheses about what predicts a Top 10 hit.
 **519 songs (9.7%)** reached it. The short answer: *who* released a song and
 *how* it was released matter far more than anything measurable in its lyrics.
 
-**Analysis:** [`B02-Billboard-Top-10-Or-Not.ipynb`](B02-Billboard-Top-10-Or-Not.ipynb)
+**Analysis:** [`A05-Billboard-Top-10-Or-Not.ipynb`](A05-Billboard-Top-10-Or-Not.ipynb)
 · **Column reference:** [`docs/data_dictionary.md`](docs/data_dictionary.md)
 
 ## Key findings
@@ -88,16 +88,17 @@ team Drive into this folder, then open the notebook. It needs only
 `data/clean/songs_analysis.csv` and makes no API calls.
 
 ```bash
-jupyter notebook B02-Billboard-Top-10-Or-Not.ipynb
+jupyter notebook A05-Billboard-Top-10-Or-Not.ipynb
 ```
 
 ## Team
 
-BA780 · Team B02 *(team ID to be confirmed)*
+BA780 · Team A05
 
-- *(member name)*
-- *(member name)*
-- *(member name)*
+- Omar Tawfik
+- Caitlin Jeng
+- Muhammad Azaan
+- Xiaoquan Dai
 
 ## AI assistance
 
