@@ -1,0 +1,11 @@
+# Python 3.14. Pinned to the versions the pipeline and notebook were run with.
+
+# data collection and cleaning (scripts/)
+pandas==3.0.6
+rapidfuzz==3.14.6
+
+# analysis notebook
+numpy==2.5.3
+scipy==1.18.1
+matplotlib==3.11.2
+jupyter==1.1.1
