@@ -1,0 +1,17 @@
+# Data is not redistributed from this repository.
+# The Billboard archive declares no licence, LRCLIB publishes none, and lyrics
+# remain the rights holders' property. Regenerate locally with scripts/.
+data/
+
+# Virtual environment
+.venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
