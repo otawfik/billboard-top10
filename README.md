@@ -7,8 +7,8 @@ release metadata, and tested ten hypotheses about what predicts a Top 10 hit.
 **519 songs (9.7%)** reached it. The short answer: *who* released a song and
 *how* it was released matter far more than anything measurable in its lyrics.
 
-**Analysis:** [`A05-Billboard-Top-10-Or-Not.ipynb`](A05-Billboard-Top-10-Or-Not.ipynb)
-· **Column reference:** [`docs/data_dictionary.md`](docs/data_dictionary.md)
+**Analysis:** [`A05-Billboard-Top-10-Or-Not.ipynb`](A05-Billboard-Top-10-Or-Not.ipynb).
+The notebook does all of the data cleaning itself, starting from the raw files.
 
 ## Key findings
 
@@ -16,10 +16,10 @@ Tested on the 2018-2024 training years (n = 4,293); 2025-2026 is held out.
 
 | Finding | Top 10 rate | Test |
 |---|---|---|
-| **Artist history is the strongest predictor.** Past hits roughly triple the odds of the next | 5.8% (no prior Top 10s) → 18.5% (10+) | p ≈ 3×10⁻²³, V = 0.159 |
+| **Artist history is the strongest predictor.** Past hits roughly triple the odds of the next | 5.8% (no prior Top 10s) → 18.5% (10+) | p ≈ 3×10⁻²³, V = 0.158 |
 | **Album drops are U-shaped, not linear.** Filler tracks compete with each other; only superstars release 10+ at once | 11.6% alone → **2.1%** at 5-9 → 11.8% at 10+ | p ≈ 1×10⁻⁹ |
 | **Genre shifts the odds, modestly.** Pop over-performs, country under-performs | pop 18.7%, country 5.3% | p ≈ 7×10⁻¹⁶, V = 0.146 |
-| **May and November are not a hit season.** The peaks were superstar album drops (Drake, Taylor Swift, Morgan Wallen) | effect vanishes without 5+ song drops | p 0.009 → 0.906 |
+| **No reliable hit season.** May and November look strong, partly because of superstar album weeks (e.g. Taylor Swift, 2024-05-04). Without drops of 5+ songs the month effect is no longer significant: November falls to 11.5%, May stays at 14.3% (27 of 189 songs) | May 15.1%, Nov 14.8% vs 10.3% average | p 0.009 → 0.906 |
 
 **Null results worth reporting.** Lyric style barely separates the groups: only
 vocabulary diversity differs (0.348 vs 0.361), while word count, repetition and
@@ -40,27 +40,23 @@ debuting inside the Top 10 has already met the definition of the target. Questio
 
 **Why `data/` is not in this repo.** Two of the three sources declare no licence,
 and the dataset contains full song lyrics. We use them for non-commercial academic
-analysis only and do not redistribute them. Rebuild the data locally (below), or
-get it from the team Drive.
+analysis only and do not redistribute them. Fetch the data yourself (below), or get
+`raw_api_data.zip` from the team Drive.
 
 ## Repository structure
 
-Scripts run in this order; each reads the previous step's output.
-
-| Script | What it does |
+| File | What it does |
 |---|---|
-| [`01_billboard.py`](scripts/01_billboard.py) | Downloads the chart archive; builds one row per song debuting 2018+; merges songs Billboard re-credited mid-run |
-| [`02_lyrics.py`](scripts/02_lyrics.py) | Fetches lyrics from LRCLIB with fuzzy matching and a confidence score |
-| [`03_musicbrainz.py`](scripts/03_musicbrainz.py) | Fetches release dates, genres (with vote counts) and artist data, at 1 request/second |
-| [`04_artist_history.py`](scripts/04_artist_history.py) | Counts each artist's prior chart record, using only songs that debuted earlier; includes leakage checks |
-| [`05_genres.py`](scripts/05_genres.py) | Maps hundreds of MusicBrainz labels to 8 broad genres |
-| [`06_lyrics_quality.py`](scripts/06_lyrics_quality.py) | Flags lyrics that look truncated; repairs unusable durations |
-| [`07_merge_all.py`](scripts/07_merge_all.py) | Joins everything into one row per song |
-| [`08_features.py`](scripts/08_features.py) | Cleans lyric text and builds the analysis features and train/test split |
+| [`A05-Billboard-Top-10-Or-Not.ipynb`](A05-Billboard-Top-10-Or-Not.ipynb) | **The analysis.** Cleans the raw data step by step (one row per song, merged duplicate credits, artist history, genres, lyric features) and answers ten questions |
+| [`scripts/01_billboard.py`](scripts/01_billboard.py) | Downloads the Billboard chart archive and lists the songs to look up |
+| [`scripts/02_lyrics.py`](scripts/02_lyrics.py) | Fetches lyrics from LRCLIB, with a match-confidence score |
+| [`scripts/03_musicbrainz.py`](scripts/03_musicbrainz.py) | Fetches release dates, genres (with vote counts) and artist data from MusicBrainz, at 1 request/second |
 
-Shared helpers: [`artist_utils.py`](scripts/artist_utils.py) (credit splitting,
-text normalisation) and [`song_utils.py`](scripts/song_utils.py) (duplicate-credit
-merging).
+Scripts 01-03 only fetch the raw data. Scripts 04-08 and their helpers
+(`artist_utils.py`, `song_utils.py`) built an earlier version of the cleaned dataset.
+They are kept for reference but **are no longer needed for the analysis**: the
+notebook now does that work itself. [`docs/data_dictionary.md`](docs/data_dictionary.md)
+describes the files those older scripts produce.
 
 ## How to reproduce
 
@@ -72,20 +68,27 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**Option A — rebuild from scratch (~5 hours).** Almost all of it is API time: the
+**Option A — fetch the data yourself (~5 hours).** Almost all of it is API time: the
 MusicBrainz limit of 1 request/second dominates. Every fetch saves progress and
 resumes if interrupted.
 
 ```bash
-for s in 01_billboard 02_lyrics 03_musicbrainz 04_artist_history \
-         05_genres 06_lyrics_quality 07_merge_all 08_features; do
-  python scripts/$s.py
-done
+python scripts/01_billboard.py
+python scripts/02_lyrics.py
+python scripts/03_musicbrainz.py
 ```
 
-**Option B — use the team's copy (minutes).** Download `data/clean/` from the
-team Drive into this folder, then open the notebook. It needs only
-`data/clean/songs_analysis.csv` and makes no API calls.
+This writes `data/raw/`. Then open the notebook.
+
+**Option B — use the team's copy (minutes).** Download `raw_api_data.zip` (4 MB) from
+the team Drive.
+
+- **Colab:** run the notebook; the first cell asks you to upload the zip and unzips it.
+- **Locally:** unzip it into `data/raw/`.
+
+The Billboard archive is read from `data/raw/all.json` if present, otherwise downloaded
+from GitHub. Either way, only charts up to 2026-09-19 are used, so results do not
+change as new weeks are added. The notebook makes no API calls.
 
 ```bash
 jupyter notebook A05-Billboard-Top-10-Or-Not.ipynb
@@ -102,6 +105,7 @@ BA780 · Team A05
 
 ## AI assistance
 
-The data pipeline, cleaning and notebook were built with AI assistance
-(Claude Code). See the AI usage disclosure in the notebook for how it was used
-and how the results were checked.
+Claude Code wrote the data collection scripts, the cleaning and analysis code in
+the notebook, and first drafts of the written interpretations; Claude (chat) helped
+plan and review. The team made the judgment calls and reviewed everything. See the
+AI usage disclosure in the notebook for details.

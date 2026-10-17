@@ -3,6 +3,11 @@
 # remain the rights holders' property. Regenerate locally with scripts/.
 data/
 
+# Class materials (course copyright) and the upload bundle of raw API data
+Intro-to-Data-Analytics-main/
+Intro-to-Data-Analytics-main.zip
+raw_api_data.zip
+
 # Virtual environment
 .venv/
 
