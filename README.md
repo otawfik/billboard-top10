@@ -61,6 +61,7 @@ analysis only and do not redistribute them. Fetch the data yourself (below), or 
 | [`scripts/01_billboard.py`](scripts/01_billboard.py) | Downloads the Billboard chart archive and lists the songs to look up |
 | [`scripts/02_lyrics.py`](scripts/02_lyrics.py) | Fetches lyrics from LRCLIB, with a match-confidence score |
 | [`scripts/03_musicbrainz.py`](scripts/03_musicbrainz.py) | Fetches release dates, genres (with vote counts) and artist data from MusicBrainz, at 1 request/second |
+| [`archive/`](archive/) | Earlier notebook versions from the team, kept for reference. The notebook above is the submission |
 
 Scripts 01-03 only fetch the raw data. Scripts 04-08 and their helpers
 (`artist_utils.py`, `song_utils.py`) built an earlier version of the cleaned dataset.
