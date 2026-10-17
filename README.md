@@ -3,14 +3,27 @@
 What separates a Billboard Hot 100 song that reaches the Top 10 from one that
 peaks lower? We built a dataset of **5,342 songs** that entered the chart between
 January 2018 and September 2026, joined the weekly chart archive to lyrics and
-release metadata, and tested ten hypotheses about what predicts a Top 10 hit.
-**519 songs (9.7%)** reached it. The short answer: *who* released a song and
-*how* it was released matter far more than anything measurable in its lyrics.
+release metadata, tested what predicts a Top 10 hit, and built a model that flags
+likely hits in their debut week. **519 songs (9.7%)** reached the Top 10. The short
+answer: *who* released a song and *how* it was released matter far more than anything
+measurable in its lyrics, and most hits are decided in their first week.
 
 **Analysis:** [`A05-Billboard-Top-10-Or-Not.ipynb`](A05-Billboard-Top-10-Or-Not.ipynb).
 The notebook does all of the data cleaning itself, starting from the raw files.
 
 ## Key findings
+
+### Final phase: deeper questions
+
+| Question | Finding |
+|---|---|
+| **Can we flag a hit in its debut week?** | A logistic regression trained on 2018-2024, using only debut-week facts, reaches **42.9% precision and 26.8% recall** on the unseen 2025-2026 songs, against 19.6% / 16.1% for an artist-history baseline and 5.9% for a random pick |
+| **Is the album-drop penalty real?** | Holding the artist fixed, **38 of 63 artists** did better with songs released alone than with songs in a drop of 5+; only 8 did better in drops (Drake: 70.0% vs 26.5%) |
+| **When do hits peak?** | **58.4%** of Top 10 hits peak in their debut week, and hits from 2022-2025 fade faster than hits from 2018-2021 |
+| **Are songs getting shorter?** | The median chart song fell from 3.40 to 3.18 minutes (2018 → 2025), but Top 10 hits run longer than other songs in 7 of 8 years |
+| **Do collaborations help?** | Credits with 2+ artists fell from 40.5% to 32.0% of songs, and they reach the Top 10 no more often than solo songs (10.4% vs 10.2%) |
+
+### Team Assignment (Phase 1)
 
 Tested on the 2018-2024 training years (n = 4,293); 2025-2026 is held out.
 
@@ -27,8 +40,9 @@ line length do not. Featured artists (9.6% vs 10.4%) and profanity (10.1% vs
 10.5%) show no effect.
 
 **A leak we caught.** Debut position looked perfectly predictive, but a song
-debuting inside the Top 10 has already met the definition of the target. Question
-10 in the notebook shows the corrected result.
+debuting inside the Top 10 has already met the definition of the target. The final
+model therefore uses only features known in the debut week, with medians and scaling
+taken from the training years only.
 
 <p align="center">
   <img src="docs/charts/chart-artist-history.jpg" width="49%" alt="Share of songs reaching the Top 10 rises from 5.8% for artists with no prior Top 10s to 18.5% for artists with 10 or more">
@@ -57,7 +71,7 @@ analysis only and do not redistribute them. Fetch the data yourself (below), or 
 
 | File | What it does |
 |---|---|
-| [`A05-Billboard-Top-10-Or-Not.ipynb`](A05-Billboard-Top-10-Or-Not.ipynb) | **The analysis.** Cleans the raw data step by step (one row per song, merged duplicate credits, artist history, genres, lyric features) and answers ten questions |
+| [`A05-Billboard-Top-10-Or-Not.ipynb`](A05-Billboard-Top-10-Or-Not.ipynb) | **The analysis (final deliverable).** Cleans the raw data step by step (one row per song, merged duplicate credits, artist history, genres, lyric features), recaps the Team Assignment, and answers five deeper questions, including a debut-week prediction model. 15 charts |
 | [`scripts/01_billboard.py`](scripts/01_billboard.py) | Downloads the Billboard chart archive and lists the songs to look up |
 | [`scripts/02_lyrics.py`](scripts/02_lyrics.py) | Fetches lyrics from LRCLIB, with a match-confidence score |
 | [`scripts/03_musicbrainz.py`](scripts/03_musicbrainz.py) | Fetches release dates, genres (with vote counts) and artist data from MusicBrainz, at 1 request/second |

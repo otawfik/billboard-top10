@@ -10,4 +10,5 @@ scipy==1.18.1
 matplotlib==3.11.2
 seaborn==0.13.2
 missingno==0.5.2
+scikit-learn==1.9.1
 jupyter==1.1.1
