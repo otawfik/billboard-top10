@@ -30,6 +30,16 @@ line length do not. Featured artists (9.6% vs 10.4%) and profanity (10.1% vs
 debuting inside the Top 10 has already met the definition of the target. Question
 10 in the notebook shows the corrected result.
 
+<p align="center">
+  <img src="docs/charts/chart-artist-history.jpg" width="49%" alt="Share of songs reaching the Top 10 rises from 5.8% for artists with no prior Top 10s to 18.5% for artists with 10 or more">
+  <img src="docs/charts/chart-album-drops.jpg" width="49%" alt="Top 10 rate falls as more songs drop the same week, recovering only for established artists at 10+ songs">
+</p>
+<p align="center">
+  <img src="docs/charts/chart-genre.jpg" width="62%" alt="Top 10 rate by genre: pop 18.7% down to country 5.3%">
+</p>
+
+*Charts are saved outputs from the analysis notebook.*
+
 ## Data sources
 
 | Source | Used for | Licence |
