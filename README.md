@@ -20,7 +20,7 @@ The notebook does all of the data cleaning itself, starting from the raw files.
 | **Can we flag a hit in its debut week?** | A logistic regression trained on 2018-2024, using only debut-week facts, reaches **42.9% precision and 26.8% recall** on the unseen 2025-2026 songs, against 19.6% / 16.1% for an artist-history baseline and 5.9% for a random pick |
 | **Is the album-drop penalty real?** | Holding the artist fixed, **38 of 63 artists** did better with songs released alone than with songs in a drop of 5+; only 8 did better in drops (Drake: 70.0% vs 26.5%). The singles advantage over album tracks (12.0% vs 9.2%) almost disappears among songs that debut alone (12.0% vs 11.4%) |
 | **When do hits peak?** | **58.4%** of Top 10 hits peak in their debut week, and hits from 2022-2025 fade faster than hits from 2018-2021 |
-| **Are songs getting shorter?** | The median chart song fell from 3.40 to 3.18 minutes (2018 → 2025), but Top 10 hits run longer than other songs in 7 of 8 years |
+| **Are songs getting shorter?** | The median chart song fell from 3:24 to 3:11 (minutes:seconds, 2018 → 2025), but Top 10 hits run longer than other songs in 7 of 8 years |
 | **Do artists from outside the US convert better?** | Among artists with earlier hits, yes: 26.8% vs 15.7% for US acts at 10+ earlier hits. But Drake, Bad Bunny and The Weeknd produce 48.4% of outside-US hits, and newcomers from abroad do no better than US newcomers |
 
 ### Team Assignment (Phase 1)
