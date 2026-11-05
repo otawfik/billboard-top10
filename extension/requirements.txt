@@ -1,0 +1,7 @@
+# Extension only (Python 3.14). Same pinned versions as the team's requirements.txt;
+# seaborn, missingno, rapidfuzz and jupyter are not needed for the extension scripts.
+pandas==3.0.6
+numpy==2.5.3
+scipy==1.18.1
+matplotlib==3.11.2
+scikit-learn==1.9.1
