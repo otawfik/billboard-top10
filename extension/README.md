@@ -23,6 +23,10 @@ and a stricter evaluation do better than the team's model, and what drives the p
   into the Top 10 later (Alex Warren's "Ordinary" debuted at 61, Leon Thomas's "Mutt" at
   100), and 10 of the 17 came from artists with no earlier Top 10. No debut-week feature
   in this data separates them from the hundreds of debuts that fade.
+- **A few weeks of chart history start to reveal climbers.** By week 3, half of the 10
+  climbers still to come rank in the top 20 of about 900 songs. Debut-week facts alone get 2
+  of 10 there. Slow burners like Leon Thomas's "Mutt" (39 weeks to the Top 10) stay
+  invisible. See the [follow-up](#follow-up-how-many-chart-weeks-until-a-climber-becomes-visible).
 - **What the models use: the artist's track record, then genre.** Shuffling the artist's
   earlier Top 10 count costs the model about half its held-out PR-AUC (0.23 → 0.12). Genre
   comes next. Of the new artist-momentum, release-format and competition features, only
@@ -139,6 +143,74 @@ with all others as observed.
 The pattern is the main finding. Debut-week facts sort songs by **who released them**. That
 finds most hits that arrive at the top in week one, and it is blind to hits that build.
 
+## Follow-up: how many chart weeks until a climber becomes visible?
+
+The debut-week model can't see the 17 test-year hits that climbed into the Top 10 after
+debut. [`weeks.py`](weeks.py) asks how much a few weeks of chart history help. After each
+chart week *k*, it takes every song that has **not yet** been in the Top 10 and predicts
+whether it ever will be.
+
+It uses only what is known by the end of week *k*:
+- the debut-week features;
+- the song's position in each week so far (off the chart counts as 101), its best position
+  and its last move;
+- its debut position (allowed here, because none of these songs debuted in the Top 10);
+- the lead artist's record as of week *k*.
+
+The discipline is the same as before. A regularised LR and gradient boosting are tuned by
+rolling origin inside 2018-2024, and the better one on validation is chosen in advance for
+each *k*. Each *k* gets one held-out 2025-2026 score, with 2,000 bootstrap resamples.
+
+| After week *k* | Test songs not yet in Top 10 | Climbers left | Random pick | Pre-chosen model | PR-AUC | Hits in its top 20 | Climbers in top 20 | Climbers in top 50 | Debut-week facts only: PR-AUC / top 20 |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 911 | 17 | 1.9% | GB | 0.14 (0.06-0.33) | 3 | 18% (0-41) | 35% (12-64) | 0.15 / 24% |
+| 2 | 905 | 11 | 1.2% | GB | 0.15 (0.05-0.37) | 5 | 45% (12-73) | 55% (29-87) | 0.08 / 9% |
+| 3 | 904 | 10 | 1.1% | GB | **0.31** (0.07-0.61) | 5 | **50%** (14-80) | **80%** (50-100) | 0.07 / 20% |
+| 4 | 904 | 10 | 1.1% | LR | 0.18 (0.06-0.42) | 4 | 40% (10-71) | 70% (36-100) | 0.10 / 30% |
+| 6 | 903 | 9 | 1.0% | LR | 0.25 (0.07-0.52) | 3 | 33% (0-71) | 78% (40-100) | 0.08 / 11% |
+
+![How predictable is a climber after k weeks](charts/chart-weeks-to-predictable.jpg)
+
+**What it shows.**
+
+- **After the debut week alone, chart position adds nothing.** At week 1 the trajectory
+  model scores the same as debut-week facts (PR-AUC 0.14 vs 0.15).
+- **From week 2 or 3, the chart path helps.** At week 3, half of the 10 remaining climbers
+  rank in the top 20 of 904 songs, and 8 of 10 in the top 50. A random pick would find
+  about 0.2 in the top 20. Debut-week facts alone stay around 0.07-0.10 PR-AUC.
+- **The gain is real against random and against debut facts, but its size isn't pinned
+  down.** With 9-11 climbers left, the CIs run from about 0.07 to 0.6.
+- **The rule "best position so far" is nearly useless** (PR-AUC 0.02-0.04). Album tracks
+  that debut in the teens and then fall dominate it, so direction and context matter more
+  than height.
+- **Tuning noise again.** Validation switched the pre-chosen model to LR at weeks 4 and 6,
+  and gradient boosting would have scored higher on test at both (0.36 and 0.29).
+
+**Worked examples** (rank among that week's not-yet-hit test songs; positions from the chart):
+
+- **Fast climbers become visible quickly.** "Golden" (HUNTR/X) went 81 → 23 → 6. It ranked
+  47th after its debut, 9th after week 2, and reached the Top 10 in week 3. "Soda Pop"
+  (Saja Boys) went 49 → 35 → 25 → 21 → 16 → 14. It ranked 11th after debut, 3rd after week 3
+  and 1st after week 6, and reached the Top 10 in week 7.
+- **"Ordinary" (Alex Warren) stays in the top 50 but never reaches the top 20.** It went
+  61 → 80 → 71 → 64 → 43 → 35 and ranked 50th, 95th, 41st, 89th and 27th after weeks 1, 2,
+  3, 4 and 6. It reached the Top 10 in week 9, and later No. 1.
+- **Slow burners stay invisible for six weeks.** "Mutt" (Leon Thomas) went 100 → off → 90 →
+  97 → 67 → 59 and ranked 97th → 512th → 192nd → 216th → 56th. It needed 39 weeks to reach
+  the Top 10. "Back To Friends" (sombr) rose from 206th to 42nd but took 33 weeks. "Folded"
+  (Kehlani) was still only 100th after week 6 and took 20 weeks.
+- **Some climbers can't be predicted at all.** 6 of the 17 climbers reached the Top 10 in
+  their second week. Three were Bad Bunny album tracks that debuted at 27-38, ranked
+  485th-775th after debut, then jumped into the Top 10 in week 2.
+
+**Caveats.**
+
+- The population includes songs that have already left the chart: half of them by week 2.
+  These are easy negatives. They inflate ROC-AUC (0.86-0.97) more than PR-AUC or the top-N
+  numbers.
+- The held-out year has 9-17 climbers per *k*, so the table is a direction, not a precise
+  estimate.
+
 ## Method
 
 **1. Reproduce the team's data and model first.** [`build_dataset.py`](build_dataset.py) is
@@ -227,6 +299,7 @@ python extension/build_dataset.py   # reproduction check, ~20 s
 python extension/model.py           # tuning + one held-out evaluation, ~4 min
 python extension/charts.py          # the four charts
 python extension/examples.py "Calibrated ensemble"   # worked examples (local only)
+python extension/weeks.py           # climbers after k chart weeks (then re-run charts.py)
 ```
 
 `results/` holds aggregate outputs only (metrics, tuning log, importance, coefficients).

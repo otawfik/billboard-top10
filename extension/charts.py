@@ -238,5 +238,48 @@ def main():
     save(fig, 'chart-partial-dependence.jpg')
 
 
+def weeks_chart():
+    """How predictable is a climber after k chart weeks (weeks.py output)."""
+    path = os.path.join(RESULTS, 'weeks_results.csv')
+    if not os.path.exists(path):
+        return
+    w = pd.read_csv(path)
+    n = [c for c in w.columns if c.startswith('recall_at_') and c != 'recall_at_50' and not c.endswith(('_lo', '_hi'))]
+    rec = n[0]
+    top_n = rec.split('_')[-1]
+    ks = sorted(w['k'].unique())
+    series = [('Chosen', 'Chosen model (debut facts + chart path so far)', BLUE, 0.0),
+              ('Best position so far', 'Rule: best position so far', INK_2, -0.12),
+              ('Debut-week features only', 'Debut-week facts only', GRAY, 0.12)]
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.6))
+    for ax, metric, title in [(a1, 'pr_auc', 'PR-AUC among songs not yet in the Top 10'),
+                              (a2, rec, f'Share of remaining climbers ranked in the top {top_n}')]:
+        for key, label, col, dx in series:
+            r = w[w['model'] == key].set_index('k').loc[ks]
+            x = np.array(ks) + dx
+            ax.vlines(x, r[metric + '_lo'], r[metric + '_hi'], color=col, lw=2)
+            ax.plot(x, r[metric], color=col, lw=1.5, marker='o', ms=7, mec=SURFACE, mew=2, label=label)
+        if metric == 'pr_auc':
+            base = w[w['model'] == 'Chosen'].set_index('k').loc[ks, 'base_rate']
+            ax.plot(ks, base, color=MUTED, lw=1.2,
+                    label=f'Random pick (base rate {base.iloc[0]:.1%} → {base.iloc[-1]:.1%})')
+        ax.set_xticks(ks)
+        ax.set_xticklabels([f'week {k}' for k in ks])
+        ax.yaxis.set_major_formatter(matplotlib.ticker.PercentFormatter(1.0, decimals=0)
+                                     if metric != 'pr_auc' else matplotlib.ticker.FormatStrFormatter('%.1f'))
+        ax.set_ylim(0, 0.7 if metric == 'pr_auc' else 1.0)
+        ax.set_title(title, fontsize=11)
+        ax.grid(axis='x', visible=False)
+    a1.legend(loc='upper left', fontsize=8.8)
+    c = w[w['model'] == 'Chosen'].set_index('k').loc[ks]
+    a2.set_xlabel('Remaining held-out climbers: ' + ', '.join(f'{int(v)}' for v in c['climbers_test'])
+                  + ' (weeks ' + ', '.join(str(k) for k in ks) + ')', fontsize=8.8, color=MUTED)
+    fig.suptitle('How predictable is a climber after k chart weeks? Held-out 2025-2026, bootstrap 95% CIs',
+                 x=0.0, ha='left', fontsize=12.5, fontweight='bold')
+    fig.tight_layout()
+    save(fig, 'chart-weeks-to-predictable.jpg')
+
+
 if __name__ == '__main__':
     main()
+    weeks_chart()
