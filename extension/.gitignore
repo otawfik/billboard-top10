@@ -1,0 +1,4 @@
+# Model outputs (predictions, cached tables) are rebuilt by the scripts and
+# contain song-level chart data, so they stay local like data/.
+output/
+__pycache__/
